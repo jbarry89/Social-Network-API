@@ -1,21 +1,35 @@
 import { Router } from 'express';
+import {
+  createThought,
+  getAllThoughts,
+  getThoughtById,
+  updateThoughtById,
+  deleteThoughtById,
+  addReaction,
+  removeReaction,
+} from '../../controllers/thoughtController';
+
 const router = Router();
-import { getVideos, getSingleVideo, createVideo, updateVideo, deleteVideo, addVideoResponse, removeVideoResponse } from '../../controllers/thoughtController.js';
 
-// /api/videos
-router.route('/').get(getVideos).post(createVideo);
+// GET all thoughts
+router.get('/thoughts', getAllThoughts);
 
-// /api/videos/:videoId
-router
-  .route('/:videoId')
-  .get(getSingleVideo)
-  .put(updateVideo)
-  .delete(deleteVideo);
+// GET a single thought by its _id
+router.get('/thoughts/:id', getThoughtById);
 
-// /api/videos/:videoId/responses
-router.route('/:videoId/responses').post(addVideoResponse);
+// POST to create a new thought
+router.post('/thoughts', createThought);
 
-// /api/videos/:videoId/responses/:responseId
-router.route('/:videoId/responses/:responseId').delete(removeVideoResponse);
+// PUT to update a thought by its _id
+router.put('/thoughts/:id', updateThoughtById);
+
+// DELETE to remove a thought by its _id
+router.delete('/thoughts/:id', deleteThoughtById);
+
+// POST to create a reaction stored in a single thought's reactions array field
+router.post('/thoughts/:thoughtId/reactions', addReaction);
+
+// DELETE to pull and remove a reaction by the reaction's reactionId value
+router.delete('/thoughts/:thoughtId/reactions/:reactionId', removeReaction);
 
 export default router;
