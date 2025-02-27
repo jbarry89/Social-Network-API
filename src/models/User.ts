@@ -1,43 +1,33 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const userSchema = new Schema ({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        match: [/.+@.+\..+/, 'Must be a valid email address'],
-    },
-    thoughts: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Thought',
-        },
-    ],
-    friends: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-        },
-    ],
-},
-{
-    toJSON: {
-        virtuals: true,
-    },
-    id: false,
+interface IUser extends Document {
+  username: string;
+  email: string;
+  thoughts: mongoose.Types.ObjectId[];
+  friends: mongoose.Types.ObjectId[];
+}
+
+const userSchema = new Schema<IUser>({
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  thoughts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Thought'
+  }],
+  friends: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 });
 
-// Creating Virtual for friendCount
-userSchema.virtual('friendCount').get(function () {
-    return this.friends.length;
-});
-
-const User = model('User', userSchema);
+const User = mongoose.model<IUser>('User', userSchema);
 
 export default User;

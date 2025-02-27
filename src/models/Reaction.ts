@@ -1,32 +1,44 @@
-import { Schema, Types } from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
 
-const reactionSchema = new Schema(
+// Reaction schema
+interface IReaction extends Document {
+  thoughtId: mongoose.Types.ObjectId; // Reference to the Thought
+  userId: mongoose.Types.ObjectId; // Reference to the User
+  reactionType: string; // Type of reaction (e.g., 'like', 'love')
+  createdAt: Date; // Timestamp when the reaction was created
+}
+
+const ReactionSchema: Schema = new Schema(
   {
-    reactionId: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-    },
-    reactionBody: {
-      type: String,
+    thoughtId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Thought', // Reference to the Thought model
       required: true,
-      maxlength: 280,
     },
-    username: {
+    userId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'User', // Reference to the User model
+      required: true,
+    },
+    reactionType: {
       type: String,
+      enum: ['like', 'love', 'wow', 'sad', 'angry'], // Possible reaction types
       required: true,
     },
     createdAt: {
       type: Date,
       default: Date.now,
-      get: (timestamp: Date) => new Date(timestamp).toISOString(),
     },
   },
   {
     toJSON: {
-      getters: true,
+      virtuals: true, // Ensure that virtuals are included in the output
     },
-    id: false,
+    toObject: {
+      virtuals: true,
+    },
   }
 );
 
-export default reactionSchema;
+const Reaction = mongoose.model<IReaction>('Reaction', ReactionSchema);
+export default Reaction;

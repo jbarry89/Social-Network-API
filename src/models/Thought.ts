@@ -1,37 +1,48 @@
-import { Schema, model } from 'mongoose';
-import reactionSchema from './Reaction';
+import mongoose, { Schema, Document } from 'mongoose';
 
-const thoughtSchema = new Schema({
-  thoughtText: {
-    type: String,
-    required: true,
-    minlength: 1,
-    maxlength: 280,
+interface IThought extends Document {
+  thoughtText: string;
+  userId: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const ThoughtSchema: Schema = new Schema(
+  {
+    thoughtText: {
+      type: String,
+      required: true,
+    },
+    userId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    get: (timestamp: Date) => new Date(timestamp).toISOString(),
-  },
-  username: {
-    type: String,
-    required: true,
-  },
-  reactions: [reactionSchema],
-},
-{
-  toJSON: {
-    virtuals: true,
-    getters: true,
-  },
-  id: false,
+  {
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    },
+  }
+);
+
+// Virtual to get reactions for a thought
+ThoughtSchema.virtual('reactions', {
+  ref: 'Reaction',
+  localField: '_id',
+  foreignField: 'thoughtId',
 });
 
-// Creating Virtual for 'reactionCount'
-thoughtSchema.virtual('reactionCount').get(function () {
-    return this.reactions.length;
-})
-
-const Thought = model('Thought', thoughtSchema);
-
+const Thought = mongoose.model<IThought>('Thought', ThoughtSchema);
 export default Thought;
