@@ -15,11 +15,12 @@ const reactionSchema = new Schema(
     },
     createdAt: {
       type: Date,
-      default: Date.now,      
+      default: Date.now,
+
     },
   },
   {
-    timestamps: false, // No timestamps needed here as we handle 'createdAt' explicitly
+    timestamps: false, 
   }
 );
 
@@ -43,6 +44,7 @@ const thoughtSchema = new Schema<IThought>(
     createdAt: {
       type: Date,
       default: Date.now,
+
     },
     username: {
       type: String,
@@ -51,8 +53,24 @@ const thoughtSchema = new Schema<IThought>(
     reactions: [reactionSchema], // Array of reactions (nested documents)
   },
   {
-    toJSON: { getters: true }, // Enable getter methods
-    toObject: { getters: true }, // Enable getter methods for toObject as well
+    toJSON: {
+      getters: true, 
+      transform: (doc, ret) => {
+        
+        // Apply the custom getter manually for createdAt
+        ret.createdAt = ret.createdAt.toISOString(); // Convert the 'createdAt' field to ISO string
+        return ret;
+      },
+    },
+    toObject: {
+      getters: true, 
+      transform: (doc, ret) => {
+
+        // Apply the custom getter manually for createdAt
+        ret.createdAt = ret.createdAt.toISOString(); // Convert the 'createdAt' field to ISO string
+        return ret;
+      },
+    },
   }
 );
 
