@@ -1,35 +1,78 @@
-import { Router } from 'express';
-import {
-  createThought,
-  getAllThoughts,
-  getThoughtById,
-  updateThoughtById,
-  deleteThoughtById,
-  addReaction,
-  removeReaction,
-} from '../../controllers/thoughtController';
+import express from 'express';
+import Reaction from '../../models/Reaction';
+import Thought from '../../models/Thought';
+import User from '../../models/User';
+import mongoose from 'mongoose';
 
-const router = Router();
+const router = express.Router();
 
-// GET all thoughts
-router.get('/thoughts', getAllThoughts);
+// POST a new reaction to a thought
+router.post('/:thoughtId/reactions', async (req, res) => {
+  try {
+    const { userId, reactionType } = req.body;
+    const thoughtId = req.params.thoughtId;
 
-// GET a single thought by its _id
-router.get('/thoughts/:id', getThoughtById);
+    // Check if the thoughtId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(thoughtId)) {
+      return res.status(400).json({ message: 'Invalid thoughtId format' });
+    }
 
-// POST to create a new thought
-router.post('/thoughts', createThought);
+    // Check if the thought exists
+    const thought = await Thought.findById(thoughtId);
+    if (!thought) {
+      return res.status(404).json({ message: 'Thought not found' });
+    }
 
-// PUT to update a thought by its _id
-router.put('/thoughts/:id', updateThoughtById);
+    // Check if the user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-// DELETE to remove a thought by its _id
-router.delete('/thoughts/:id', deleteThoughtById);
+    // Create a new reaction
+    const newReaction = new Reaction({
+      thoughtId,
+      userId,
+      reactionType,
+    });
 
-// POST to create a reaction stored in a single thought's reactions array field
-router.post('/thoughts/:thoughtId/reactions', addReaction);
+    await newReaction.save();
+    res.status(201).json(newReaction);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
-// DELETE to pull and remove a reaction by the reaction's reactionId value
-router.delete('/thoughts/:thoughtId/reactions/:reactionId', removeReaction);
+// DELETE a reaction
+router.delete('/:thoughtId/reactions/:reactionId', async (req, res) => {
+  try {
+    const { thoughtId, reactionId } = req.params;
+
+    // Check if the reaction exists
+    const reaction = await Reaction.findById(reactionId);
+    if (!reaction) {
+      return res.status(404).json({ message: 'Reaction not found' });
+    }
+
+    // Delete the reaction
+    await reaction.deleteOne();
+    res.status(200).json({ message: 'Reaction removed' });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// GET all reactions for a specific thought
+router.get('/:thoughtId/reactions', async (req, res) => {
+  try {
+    const thoughtId = req.params.thoughtId;
+
+    // Find all reactions for the thought
+    const reactions = await Reaction.find({ thoughtId });
+    res.status(200).json(reactions);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 export default router;
