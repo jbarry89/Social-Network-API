@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 
+// function to connect to the MongoDB database
 const connectDB = async () => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/socialnetwork');
+        // Uses environmental variable or default MongoDB URI
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/socialnetwork');
         console.log('MongoDB is Connected!');
     } catch (error) {
         console.error('MongoDB connection Failed.', error);
@@ -10,6 +12,5 @@ const connectDB = async () => {
     }
 
 };
-
 
 export default connectDB;
