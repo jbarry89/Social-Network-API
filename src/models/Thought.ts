@@ -1,48 +1,62 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 
+// Define the structure of a Reaction document
+const reactionSchema = new Schema(
+  {
+    reactionBody: {
+      type: String,
+      required: true,
+      minlength: 1,
+      maxlength: 280,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,      
+    },
+  },
+  {
+    timestamps: false, // No timestamps needed here as we handle 'createdAt' explicitly
+  }
+);
+
+// Define the structure of a Thought document
 interface IThought extends Document {
   thoughtText: string;
-  userId: mongoose.Types.ObjectId;
   createdAt: Date;
-  updatedAt: Date;
+  username: string;
+  reactions: typeof reactionSchema[];
 }
 
-const ThoughtSchema: Schema = new Schema(
+// Create the schema for Thought
+const thoughtSchema = new Schema<IThought>(
   {
     thoughtText: {
       type: String,
       required: true,
-    },
-    userId: {
-      type: mongoose.Types.ObjectId,
-      ref: 'User',
-      required: true,
+      minlength: 1,
+      maxlength: 280,
     },
     createdAt: {
       type: Date,
       default: Date.now,
     },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
+    username: {
+      type: String,
+      required: true,
     },
+    reactions: [reactionSchema], // Array of reactions (nested documents)
   },
   {
-    toJSON: {
-      virtuals: true,
-    },
-    toObject: {
-      virtuals: true,
-    },
+    toJSON: { getters: true }, // Enable getter methods
+    toObject: { getters: true }, // Enable getter methods for toObject as well
   }
 );
 
-// Virtual to get reactions for a thought
-ThoughtSchema.virtual('reactions', {
-  ref: 'Reaction',
-  localField: '_id',
-  foreignField: 'thoughtId',
-});
+// Create the model from the schema
+const Thought = model<IThought>('Thought', thoughtSchema);
 
-const Thought = mongoose.model<IThought>('Thought', ThoughtSchema);
 export default Thought;
