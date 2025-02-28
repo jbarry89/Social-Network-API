@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "../models/User";
 import Thought from "../models/Thought";
-import Reaction from "../models/Reaction";
 
 dotenv.config();
 
@@ -15,7 +14,7 @@ const seedDatabase = async () => {
     // Clearing the existing data
     await User.deleteMany({});
     await Thought.deleteMany({});
-    await Reaction.deleteMany({});
+
     console.log("Old data cleared!");
 
     // Seed the Users
@@ -29,35 +28,53 @@ const seedDatabase = async () => {
 
     // Seed the thoughts with the associated user
     const thoughts = await Thought.insertMany([
-      { thoughtText: "This is my first thought!", userId: users[0]._id },
-      { thoughtText: "Learning MongoDB is fun!", userId: users[1]._id },
-      { thoughtText: "I love backend development!", userId: users[2]._id },
+      {
+        thoughtText: "This is my first thought!",
+        username: users[0].username,
+        reaction: [],
+      },
+      {
+        thoughtText: "Learning MongoDB is fun!",
+        username: users[1].username,
+        reaction: [],
+      },
+      {
+        thoughtText: "I love backend development!",
+        username: users[2].username,
+        reaction: [],
+      },
     ]);
 
     console.log("Thoughts have been seeded:", thoughts);
 
-    // Seed The Reactions (Associate with thoughts and users)
-    const reactions = await Reaction.insertMany([
+    // Seed the Reactions associated with thoughts and users
+    await Thought.updateOne(
+      { _id: thoughts[0]._id },
       {
-        thoughtId: thoughts[0]._id,
-        userId: users[1]._id,
-        reactionType: "like",
-      },
+        $push: {
+          reactions: { reactionBody: "like", username: users[1].username },
+        },
+      }
+    );
+    await Thought.updateOne(
+      { _id: thoughts[1]._id },
       {
-        thoughtId: thoughts[1]._id,
-        userId: users[2]._id,
-        reactionType: "love",
-      },
-      { thoughtId: thoughts[2]._id, 
-        userId: users[0]._id, 
-        reactionType: "wow" },
-    ]);
+        $push: {
+          reactions: { reactionBody: "love", username: users[2].username },
+        },
+      }
+    );
+    await Thought.updateOne(
+      { _id: thoughts[2]._id },
+      {
+        $push: {
+          reactions: { reactionBody: "wow", username: users[0].username },
+        },
+      }
+    );
 
-    console.log("Reaction have been seeded:", reactions);
-
-    mongoose.connection.close();
+    mongoose.connection.close(); // Close the database connection when seeding is complete
     console.log("Database seeding complete!");
-
   } catch (err) {
     console.error("Error seeding the Database:", err);
     mongoose.connection.close();
