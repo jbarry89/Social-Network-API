@@ -27,7 +27,7 @@
   ## Usage 
   Here is an example screenshot of the Social Network API App in Insomnia:
 
-  ![Candidate-Search/Home Screenshot](./src/assets/social-network-api-insomnia-screenshot.jpg)
+  ![Social-Network-App-Screenshot on Insomnia](./src/assets/social-network-api-insomnia-screenshot.jpg)
 
   
   ## Contributing
