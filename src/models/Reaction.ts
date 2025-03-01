@@ -1,4 +1,5 @@
 import { Schema, Types } from 'mongoose';
+import moment from "moment";
 
 // Reaction schema (subdocument in Thought)
 const reactionSchema = new Schema(
@@ -19,7 +20,7 @@ const reactionSchema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      get: (createdAt: Date) => createdAt.toISOString(), // Format the timestamp
+      get: (createdAt: Date) => moment(createdAt).format("MMM Do, YYYY [at] h:mm A"), // Format the ISO format timestamp
     },
   },
   {
