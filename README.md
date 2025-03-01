@@ -23,6 +23,7 @@
   * NoSQL
   * Mongoose
   * dotenv
+  * moment *(convert timestamp into readable format)*
 
   ## Usage 
   Here is an example screenshot of the Social Network API App in Insomnia:
