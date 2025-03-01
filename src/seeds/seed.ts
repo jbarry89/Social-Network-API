@@ -39,7 +39,7 @@ const seedDatabase = async () => {
         reaction: [],
       },
       {
-        thoughtText: "I love backend development!",
+        thoughtText: "The code is working!",
         username: users[2].username,
         reaction: [],
       },
