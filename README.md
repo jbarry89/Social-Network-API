@@ -50,12 +50,12 @@
   ```
 
   ```bash
-  npm run build
+  npm run seed
 
   ```
 
   ```bash
-  npm run seed
+  npm run build
 
   ```
 
