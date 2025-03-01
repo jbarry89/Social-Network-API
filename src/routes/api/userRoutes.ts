@@ -1,4 +1,4 @@
-import express from 'express';
+import {Router} from 'express';
 import {
   getUsers,
   createUser,
@@ -9,15 +9,24 @@ import {
   removeFriend,
 } from '../../controllers/userController';
 
-const router = express.Router();
+const router = Router();
 
-// Routes
-router.get('/', getUsers);
-router.post('/', createUser);
-router.get('/:userId', getUserById);
-router.put('/:userId', updateUser);
-router.delete('/:userId', deleteUser);
-router.post('/:userId/friends/:friendId', addFriend);
-router.delete('/:userId/friends/:friendId', removeFriend);
+// User Routes
+router.route('/')
+  .get(getUsers)
+  .post(createUser);
+
+
+// User Routes by ID
+router.route('/:userId')
+  .get(getUserById)
+  .put(updateUser)
+  .delete(deleteUser);
+
+
+//Friend Routes
+router.route('/:userId/friends/:friendId')
+  .post(addFriend)
+  .delete(removeFriend);
 
 export default router;
