@@ -28,6 +28,8 @@
   ## Usage 
   Here is an example screenshot of the Social Network API App in Insomnia:
 
+  [Social Network API Video Link](https://drive.google.com/file/d/11lz0aN8M1X2KVM1HLJmSlTd6qU3au1YF/view)
+
   ![Social-Network-App-Screenshot on Insomnia](./src/assets/social-network-api-insomnia-screenshot.jpg)
 
   
